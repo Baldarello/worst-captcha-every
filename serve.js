@@ -2,7 +2,7 @@ const { serve } = Bun;
 const dist = import.meta.dir + "/dist";
 
 serve({
-  port: 3001,
+  port: 8080,
   hostname: "0.0.0.0",
   async fetch(req) {
     const url = new URL(req.url);
