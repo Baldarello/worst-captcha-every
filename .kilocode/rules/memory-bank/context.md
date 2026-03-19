@@ -2,28 +2,25 @@
 
 ## Current State
 
-**Template Status**: CAPTCHA DELL'INFERNO running via Vite
+**Template Status**: CAPTCHA DELL'INFERNO running via Vite SPA
 
-The project switched from Next.js to a simple Vite SPA. The captcha-hell app runs directly via Vite dev server on port 3001.
+Project is now a simple Vite + React SPA (no Next.js). Dev server runs on port 3001.
 
 ## Recently Completed
 
-- [x] Base Next.js 16 setup with App Router (replaced by Vite)
-- [x] TypeScript configuration with strict mode
-- [x] Tailwind CSS 4 integration
-- [x] ESLint configuration
-- [x] Memory bank documentation
-- [x] Recipe system for common features
-- [x] CAPTCHA DELL'INFERNO - running via Vite (captcha-hell/)
-- [x] Dev server running on port 3001 (Vite, exposed via sandbox proxy)
+- [x] Removed Next.js, switched to Vite SPA
+- [x] CAPTCHA DELL'INFERNO running at root level
+- [x] Dev server on port 3001 (exposed via sandbox proxy)
 
 ## Current Structure
 
 | File/Directory | Purpose | Status |
 |----------------|---------|--------|
-| `captcha-hell/` | CAPTCHA DELL'INFERNO Vite SPA | ✅ Running on :3001 |
-| `captcha-hell/src/App.jsx` | Main captcha component | ✅ Active |
-| `captcha-hell/src/index.css` | Styles + animations | ✅ Active |
+| `index.html` | Entry point | ✅ Active |
+| `src/main.jsx` | React bootstrap | ✅ Active |
+| `src/App.jsx` | CAPTCHA component | ✅ Active |
+| `src/index.css` | Tailwind + animations | ✅ Active |
+| `vite.config.js` | Vite config | ✅ Active |
 | `.kilocode/` | AI context & recipes | ✅ Ready |
 
 ## Current Focus
@@ -87,4 +84,4 @@ export async function GET() {
 | Date | Changes |
 |------|---------|
 | Initial | Template created with base setup |
-| 2026-03-19 | Started Next.js, switched to Vite SPA for CAPTCHA DELL'INFERNO |
+| 2026-03-19 | Removed Next.js, switched to Vite SPA with CAPTCHA DELL'INFERNO |

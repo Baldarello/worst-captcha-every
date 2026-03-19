@@ -1,7 +1,7 @@
-"use client";
-
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
+import './App.css';
 
 const TOTAL_STEPS = 100;
 
@@ -38,16 +38,16 @@ const CHALLENGE_TYPES = [
   'avoidClick',
 ];
 
-const getChallengeType = (step: number) => {
+const getChallengeType = (step) => {
   const idx = step % CHALLENGE_TYPES.length;
   return CHALLENGE_TYPES[idx];
 };
 
-const getFontClass = (step: number) => {
+const getFontClass = (step) => {
   return FONTS[Math.floor(step / 5) % FONTS.length];
 };
 
-const getThemeForLevel = (step: number) => {
+const getThemeForLevel = (step) => {
   const level = Math.floor(step / 10);
   const themes = [
     { bg: '#0a0a0a', accent: '#ff00ff', text: '#00ff41', label: 'Default' },
@@ -64,86 +64,89 @@ const getThemeForLevel = (step: number) => {
   return themes[level % themes.length];
 };
 
-const randomBetween = (min: number, max: number) => Math.random() * (max - min) + min;
-const randomInt = (min: number, max: number) => Math.floor(randomBetween(min, max + 1));
+const randomBetween = (min, max) => Math.random() * (max - min) + min;
+const randomInt = (min, max) => Math.floor(randomBetween(min, max + 1));
 
 const generateDynamicWord = () => {
   const words = ['DESTINY', 'NIGHTMARE', 'CHAOS', 'SUFFERING', 'HOPELESS', 'ETERNITY', 'PUNISH', 'AGONY', 'MISERY', 'TORMENT'];
   return words[randomInt(0, words.length - 1)];
 };
 
-interface Popup {
-  id: number;
-  message: string;
-  x: number;
-  y: number;
-}
-
-interface AvoidItem {
-  id: number;
-  x: number;
-  y: number;
-  isTarget: boolean;
-  visible: boolean;
-}
-
-export default function Home() {
+function App() {
   const [step, setStep] = useState(0);
   const [started, setStarted] = useState(false);
   const [failed, setFailed] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [failMessage, setFailMessage] = useState('');
 
+  // Fleeing button state
   const [buttonPos, setButtonPos] = useState({ x: 50, y: 50 });
+
+  // Amnesic UI state
   const [buttonsVisible, setButtonsVisible] = useState(true);
 
+  // Dynamic password state
   const [passwordTarget, setPasswordTarget] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordDisplay, setPasswordDisplay] = useState('');
-  const passwordIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const passwordIntervalRef = useRef(null);
 
+  // Click timing state
   const [targetPos, setTargetPos] = useState(0);
-  const timingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timingIntervalRef = useRef(null);
 
-  const [popups, setPopups] = useState<Popup[]>([]);
+  // Distractions
+  const [popups, setPopups] = useState([]);
   const [marqueeMessage, setMarqueeMessage] = useState('');
+  // showHint / setShowHint kept for future challenge expansion
 
+  // Fake loading bar
   const [fakeProgress, setFakeProgress] = useState(0);
-  const fakeProgressRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fakeProgressRef = useRef(null);
 
-  const ghostTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Ghost click
+  const ghostTimerRef = useRef(null);
 
+  // Idle detection
   const [, setIdleTime] = useState(0);
   const [showIdleButton, setShowIdleButton] = useState(false);
-  const idleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const idleTimerRef = useRef(null);
   const mouseMovedRef = useRef(true);
 
+  // Inverted input
   const [isInverted, setIsInverted] = useState(false);
 
+  // Hold button
   const [holdProgress, setHoldProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
-  const holdIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const holdIntervalRef = useRef(null);
 
+  // Multi click
   const [clickCount, setClickCount] = useState(0);
 
-  const [memorySequence, setMemorySequence] = useState<number[]>([]);
-  const [playerSequence, setPlayerSequence] = useState<number[]>([]);
+  // Memory sequence
+  const [memorySequence, setMemorySequence] = useState([]);
+  const [playerSequence, setPlayerSequence] = useState([]);
   const [showingSequence, setShowingSequence] = useState(false);
   const [activeCell, setActiveCell] = useState(-1);
 
-  const [avoidItems, setAvoidItems] = useState<AvoidItem[]>([]);
+  // Avoid click
+  const [avoidItems, setAvoidItems] = useState([]);
 
+  // Progress
   const progress = useMemo(() => ((step) / TOTAL_STEPS) * 100, [step]);
   const theme = useMemo(() => getThemeForLevel(step), [step]);
   const fontClass = useMemo(() => getFontClass(step), [step]);
   const challengeType = useMemo(() => getChallengeType(step), [step]);
 
-  const ghostClick = useCallback((callback: () => void) => {
+  // Ghost click handler - adds random delay to every interaction
+  const ghostClick = useCallback((callback) => {
     const delay = randomBetween(50, 300);
     ghostTimerRef.current = setTimeout(callback, delay);
   }, []);
 
-  const handleFail = useCallback((msg?: string) => {
+  // Fail handler - resets to step 0
+  const handleFail = useCallback((msg) => {
     const message = msg || INSULTS[randomInt(0, INSULTS.length - 1)];
     setFailMessage(message);
     setFailed(true);
@@ -154,6 +157,7 @@ export default function Home() {
     }, 3000);
   }, []);
 
+  // Complete a step
   const handleStepCompletion = useCallback(() => {
     if (step >= TOTAL_STEPS - 1) {
       setCompleted(true);
@@ -173,12 +177,14 @@ export default function Home() {
     });
   }, [step, ghostClick]);
 
+  // Fail and reset
   const handleStepFail = useCallback(() => {
     ghostClick(() => {
       handleFail();
     });
   }, [ghostClick, handleFail]);
 
+  // Idle detection
   useEffect(() => {
     if (!started || completed || failed) return;
 
@@ -204,10 +210,11 @@ export default function Home() {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('click', handleMouseMove);
-      if (idleTimerRef.current) clearInterval(idleTimerRef.current);
+      clearInterval(idleTimerRef.current);
     };
   }, [started, completed, failed]);
 
+  // Amnesic UI effect
   useEffect(() => {
     if (!started || completed || failed) return;
 
@@ -227,6 +234,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [started, completed, failed, challengeType, step]);
 
+  // Dynamic password - scramble letters while typing
   useEffect(() => {
     if (!started || completed || failed || challengeType !== 'dynamicPassword') return;
 
@@ -245,11 +253,10 @@ export default function Home() {
       });
     }, 300);
 
-    return () => {
-      if (passwordIntervalRef.current) clearInterval(passwordIntervalRef.current);
-    };
+    return () => clearInterval(passwordIntervalRef.current);
   }, [started, completed, failed, challengeType, step]);
 
+  // Click timing effect
   useEffect(() => {
     if (!started || completed || failed || challengeType !== 'clickTiming') return;
 
@@ -258,11 +265,10 @@ export default function Home() {
       setTargetPos((prev) => (prev + 2) % 100);
     }, 50);
 
-    return () => {
-      if (timingIntervalRef.current) clearInterval(timingIntervalRef.current);
-    };
+    return () => clearInterval(timingIntervalRef.current);
   }, [started, completed, failed, challengeType, step]);
 
+  // Fake progress bar
   useEffect(() => {
     if (!started || completed || failed) return;
 
@@ -276,18 +282,17 @@ export default function Home() {
       });
     }, 100);
 
-    return () => {
-      if (fakeProgressRef.current) clearInterval(fakeProgressRef.current);
-    };
+    return () => clearInterval(fakeProgressRef.current);
   }, [started, completed, failed, step]);
 
+  // Distraction popups
   useEffect(() => {
     if (!started || completed || failed) return;
 
     const interval = setInterval(() => {
       if (Math.random() > 0.6) {
         const messages = [
-          "Il tuo mouse \u00e8 lento.",
+          "Il tuo mouse è lento.",
           "Stai ancora provando?",
           "Y U NO CLICK RIGHT?",
           "Funziona sul mio PC.",
@@ -296,7 +301,7 @@ export default function Home() {
           "Git blame dice: sei tu.",
           "Buffer overflow nel cervello.",
           "Segfault a livello 0.",
-          "La barra di caricamento \u00e8 una bugia.",
+          "La barra di caricamento è una bugia.",
         ];
         const popup = {
           id: Date.now(),
@@ -314,6 +319,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [started, completed, failed]);
 
+  // Marquee insults
   useEffect(() => {
     if (!started || completed || failed) return;
     const msgs = [
@@ -326,6 +332,7 @@ export default function Home() {
     setMarqueeMessage(msgs[randomInt(0, msgs.length - 1)]);
   }, [step, started, completed, failed]);
 
+  // Memory sequence setup
   useEffect(() => {
     if (!started || completed || failed || challengeType !== 'memorySequence') return;
     const len = Math.min(3 + Math.floor(step / 20), 7);
@@ -348,6 +355,7 @@ export default function Home() {
     return () => clearInterval(showInterval);
   }, [started, completed, failed, challengeType, step]);
 
+  // Avoid click items
   useEffect(() => {
     if (!started || completed || failed || challengeType !== 'avoidClick') return;
     const items = Array.from({ length: 12 }, (_, i) => ({
@@ -360,12 +368,13 @@ export default function Home() {
     setAvoidItems(items);
   }, [started, completed, failed, challengeType, step]);
 
+  // Hold button logic
   useEffect(() => {
     if (isHolding && !completed && !failed) {
       holdIntervalRef.current = setInterval(() => {
         setHoldProgress((prev) => {
           if (prev >= 100) {
-            if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
+            clearInterval(holdIntervalRef.current);
             handleStepCompletion();
             return 100;
           }
@@ -373,19 +382,18 @@ export default function Home() {
         });
       }, 100);
     }
-    return () => {
-      if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
-    };
+    return () => clearInterval(holdIntervalRef.current);
   }, [isHolding, completed, failed, handleStepCompletion]);
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (ghostTimerRef.current) clearTimeout(ghostTimerRef.current);
-      if (passwordIntervalRef.current) clearInterval(passwordIntervalRef.current);
-      if (timingIntervalRef.current) clearInterval(timingIntervalRef.current);
-      if (fakeProgressRef.current) clearInterval(fakeProgressRef.current);
-      if (idleTimerRef.current) clearInterval(idleTimerRef.current);
-      if (holdIntervalRef.current) clearInterval(holdIntervalRef.current);
+      clearTimeout(ghostTimerRef.current);
+      clearInterval(passwordIntervalRef.current);
+      clearInterval(timingIntervalRef.current);
+      clearInterval(fakeProgressRef.current);
+      clearInterval(idleTimerRef.current);
+      clearInterval(holdIntervalRef.current);
     };
   }, []);
 
@@ -396,7 +404,7 @@ export default function Home() {
     });
   };
 
-  const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordInput = (e) => {
     const val = e.target.value;
     setPasswordInput(val);
     if (val.toUpperCase() === passwordTarget) {
@@ -412,7 +420,7 @@ export default function Home() {
     }
   };
 
-  const handleMemoryCellClick = (cellIdx: number) => {
+  const handleMemoryCellClick = (cellIdx) => {
     if (showingSequence) return;
     const newSeq = [...playerSequence, cellIdx];
     setPlayerSequence(newSeq);
@@ -427,7 +435,7 @@ export default function Home() {
     }
   };
 
-  const handleAvoidItemClick = (item: AvoidItem) => {
+  const handleAvoidItemClick = (item) => {
     if (item.isTarget) {
       handleStepCompletion();
     } else {
@@ -461,14 +469,14 @@ export default function Home() {
       );
     }
 
-    const challengeDescriptions: Record<string, string> = {
+    const challengeDescriptions = {
       fleeingButton: 'Clicca il bottone... SE CI RIESCI.',
       amnesicUI: "L'UI ha l'Alzheimer. Clicca prima che svanisca.",
       invertedInput: isInverted
         ? 'Premi AVANTI per andare AVANTI (o forse no).'
         : 'Premi AVANTI per andare INDIETRO (o forse no).',
       dynamicPassword: 'Scrivi la parola che cambia mentre scrivi.',
-      clickTiming: 'Clicca quando la barra \u00e8 nel centro esatto.',
+      clickTiming: 'Clicca quando la barra è nel centro esatto.',
       staticClick: 'Clicca il bottone. Facile... no?',
       holdButton: 'Tieni premuto per 2 secondi. Non muoverti.',
       multiClick: `Clicca 5 volte. Conteggio: ${clickCount}/5`,
@@ -478,14 +486,17 @@ export default function Home() {
 
     return (
       <div className="relative w-full h-full flex flex-col items-center justify-center">
-        <p
+        <motion.p
           key={`desc-${step}`}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
           className={`text-lg md:text-xl mb-6 text-center px-4 ${fontClass}`}
           style={{ color: theme.text }}
         >
           {challengeDescriptions[challengeType]}
-        </p>
+        </motion.p>
 
+        {/* CHALLENGE: FLEEING BUTTON */}
         {challengeType === 'fleeingButton' && (
           <div className="relative w-full h-64 md:h-80">
             <AnimatePresence>
@@ -514,6 +525,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: AMNESIC UI */}
         {challengeType === 'amnesicUI' && (
           <div className="relative w-full h-64 md:h-80">
             <AnimatePresence>
@@ -565,6 +577,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: INVERTED INPUT */}
         {challengeType === 'invertedInput' && (
           <div className="flex flex-col items-center gap-6">
             <div className="flex gap-4">
@@ -630,6 +643,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: DYNAMIC PASSWORD */}
         {challengeType === 'dynamicPassword' && (
           <div className="flex flex-col items-center gap-6">
             <div
@@ -663,6 +677,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: CLICK TIMING */}
         {challengeType === 'clickTiming' && (
           <div className="flex flex-col items-center gap-6 w-full max-w-md">
             <div className="relative w-full h-16 rounded overflow-hidden" style={{ background: `${theme.accent}20`, border: `2px solid ${theme.accent}` }}>
@@ -701,6 +716,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: STATIC CLICK */}
         {challengeType === 'staticClick' && (
           <div className="flex flex-col items-center gap-4">
             <motion.button
@@ -734,6 +750,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: HOLD BUTTON */}
         {challengeType === 'holdButton' && (
           <div className="flex flex-col items-center gap-6">
             <div className="relative w-64 h-6 rounded overflow-hidden" style={{ background: `${theme.accent}20` }}>
@@ -762,6 +779,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: MULTI CLICK */}
         {challengeType === 'multiClick' && (
           <div className="flex flex-col items-center gap-6">
             <div className="text-4xl font-black" style={{ color: theme.accent }}>
@@ -789,6 +807,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: MEMORY SEQUENCE */}
         {challengeType === 'memorySequence' && (
           <div className="flex flex-col items-center gap-6">
             <div className="grid grid-cols-2 gap-4">
@@ -822,6 +841,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* CHALLENGE: AVOID CLICK */}
         {challengeType === 'avoidClick' && (
           <div className="relative w-full h-64 md:h-80">
             {avoidItems.map((item) => (
@@ -855,22 +875,29 @@ export default function Home() {
     );
   };
 
+  // Starting screen
   if (!started) {
     return (
       <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#000' }}>
         <div className="scanline-overlay" />
-        <div className="text-center max-w-lg px-8">
-          <h1
+        <motion.div
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center max-w-lg px-8"
+        >
+          <motion.h1
+            animate={{ rotate: [0, -2, 2, -2, 0] }}
+            transition={{ duration: 0.5, repeat: Infinity }}
             className="text-4xl md:text-6xl font-black glitch-text mb-8"
             style={{ color: '#ff0000' }}
           >
-            CAPTCHA DELL&apos;INFERNO
-          </h1>
+            CAPTCHA DELL'INFERNO
+          </motion.h1>
           <p className="text-lg mb-2" style={{ color: '#ff6600' }}>
             100 livelli di pura frustrazione.
           </p>
           <p className="text-sm mb-8" style={{ color: '#666' }}>
-            Non c&apos;è undo. Non c&apos;è pietà. Non c&apos;è salvezza.
+            Non c'è undo. Non c'è pietà. Non c'è salvezza.
           </p>
           <motion.button
             whileHover={{ scale: 1.1, rotate: randomBetween(-5, 5) }}
@@ -889,7 +916,7 @@ export default function Home() {
           <p className="text-xs mt-6" style={{ color: '#333' }}>
             (non cliccare se hai problemi cardiaci)
           </p>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -913,6 +940,7 @@ export default function Home() {
     >
       <div className="scanline-overlay" />
 
+      {/* FAKE PROGRESS BAR */}
       <div className="w-full h-2 fixed top-0 z-50" style={{ background: '#111' }}>
         <motion.div
           className="h-full"
@@ -923,6 +951,7 @@ export default function Home() {
         />
       </div>
 
+      {/* TOP BAR */}
       <div
         className="flex items-center justify-between px-4 py-3 md:px-8 z-10"
         style={{ borderBottom: `2px solid ${theme.accent}40` }}
@@ -944,27 +973,45 @@ export default function Home() {
         </span>
       </div>
 
+      {/* MARQUEE */}
       <div className="w-full overflow-hidden py-1" style={{ background: `${theme.accent}10` }}>
         <div className="marquee-text whitespace-nowrap text-sm font-bold" style={{ color: theme.accent }}>
           {marqueeMessage}
         </div>
       </div>
 
+      {/* MAIN CHALLENGE AREA */}
       <div className="flex-1 relative flex items-center justify-center p-4">
-        <div
-              key={step}
-              className="w-full max-w-2xl"
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, scale: 0.8, rotate: randomBetween(-10, 10) }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 1.2, rotate: randomBetween(-5, 5) }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-2xl"
+          >
+            {/* Step title */}
+            <motion.h2
+              className={`text-2xl md:text-3xl font-black text-center mb-8 ${fontClass}`}
+              style={{ color: theme.accent }}
+              animate={{
+                textShadow: [
+                  `0 0 10px ${theme.accent}80`,
+                  `0 0 20px ${theme.accent}`,
+                  `0 0 10px ${theme.accent}80`,
+                ],
+              }}
+              transition={{ duration: 1, repeat: Infinity }}
             >
-              <h2
-                className={`text-2xl md:text-3xl font-black text-center mb-8 ${fontClass}`}
-                style={{ color: theme.accent }}
-              >
-                SFIDA #{step + 1}
-              </h2>
+              SFIDA #{step + 1}
+            </motion.h2>
 
-              {renderChallenge()}
-            </div>
+            {renderChallenge()}
+          </motion.div>
+        </AnimatePresence>
 
+        {/* DISTRACTION POPUPS */}
         <AnimatePresence>
           {popups.map((popup) => (
             <motion.div
@@ -987,6 +1034,7 @@ export default function Home() {
           ))}
         </AnimatePresence>
 
+        {/* IDLE CAPTURE-THE-FLAG BUTTON */}
         <AnimatePresence>
           {showIdleButton && !completed && (
             <motion.button
@@ -1012,6 +1060,7 @@ export default function Home() {
         </AnimatePresence>
       </div>
 
+      {/* BOTTOM BAR */}
       <div
         className="flex items-center justify-center gap-4 px-4 py-3 z-10"
         style={{ borderTop: `2px solid ${theme.accent}40` }}
@@ -1021,6 +1070,7 @@ export default function Home() {
         </span>
       </div>
 
+      {/* FAILURE OVERLAY */}
       <AnimatePresence>
         {failed && (
           <motion.div
@@ -1055,3 +1105,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default App;
