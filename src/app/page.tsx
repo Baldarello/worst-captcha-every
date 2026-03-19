@@ -478,15 +478,13 @@ export default function Home() {
 
     return (
       <div className="relative w-full h-full flex flex-col items-center justify-center">
-        <motion.p
+        <p
           key={`desc-${step}`}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
           className={`text-lg md:text-xl mb-6 text-center px-4 ${fontClass}`}
           style={{ color: theme.text }}
         >
           {challengeDescriptions[challengeType]}
-        </motion.p>
+        </p>
 
         {challengeType === 'fleeingButton' && (
           <div className="relative w-full h-64 md:h-80">
@@ -861,19 +859,13 @@ export default function Home() {
     return (
       <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#000' }}>
         <div className="scanline-overlay" />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-lg px-8"
-        >
-          <motion.h1
-            animate={{ rotate: [0, -2, 2, -2, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity }}
+        <div className="text-center max-w-lg px-8">
+          <h1
             className="text-4xl md:text-6xl font-black glitch-text mb-8"
             style={{ color: '#ff0000' }}
           >
             CAPTCHA DELL&apos;INFERNO
-          </motion.h1>
+          </h1>
           <p className="text-lg mb-2" style={{ color: '#ff6600' }}>
             100 livelli di pura frustrazione.
           </p>
@@ -897,7 +889,7 @@ export default function Home() {
           <p className="text-xs mt-6" style={{ color: '#333' }}>
             (non cliccare se hai problemi cardiaci)
           </p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -959,33 +951,19 @@ export default function Home() {
       </div>
 
       <div className="flex-1 relative flex items-center justify-center p-4">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, scale: 0.8, rotate: randomBetween(-10, 10) }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            exit={{ opacity: 0, scale: 1.2, rotate: randomBetween(-5, 5) }}
-            transition={{ duration: 0.3 }}
-            className="w-full max-w-2xl"
-          >
-            <motion.h2
-              className={`text-2xl md:text-3xl font-black text-center mb-8 ${fontClass}`}
-              style={{ color: theme.accent }}
-              animate={{
-                textShadow: [
-                  `0 0 10px ${theme.accent}80`,
-                  `0 0 20px ${theme.accent}`,
-                  `0 0 10px ${theme.accent}80`,
-                ],
-              }}
-              transition={{ duration: 1, repeat: Infinity }}
+        <div
+              key={step}
+              className="w-full max-w-2xl"
             >
-              SFIDA #{step + 1}
-            </motion.h2>
+              <h2
+                className={`text-2xl md:text-3xl font-black text-center mb-8 ${fontClass}`}
+                style={{ color: theme.accent }}
+              >
+                SFIDA #{step + 1}
+              </h2>
 
-            {renderChallenge()}
-          </motion.div>
-        </AnimatePresence>
+              {renderChallenge()}
+            </div>
 
         <AnimatePresence>
           {popups.map((popup) => (
