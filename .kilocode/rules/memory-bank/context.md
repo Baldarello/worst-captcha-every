@@ -2,30 +2,28 @@
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Template Status**: CAPTCHA DELL'INFERNO running via Vite
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+The project switched from Next.js to a simple Vite SPA. The captcha-hell app runs directly via Vite dev server on port 3001.
 
 ## Recently Completed
 
-- [x] Base Next.js 16 setup with App Router
+- [x] Base Next.js 16 setup with App Router (replaced by Vite)
 - [x] TypeScript configuration with strict mode
 - [x] Tailwind CSS 4 integration
 - [x] ESLint configuration
 - [x] Memory bank documentation
 - [x] Recipe system for common features
-- [x] CAPTCHA DELL'INFERNO - ported from captcha-hell Vite project to Next.js
-- [x] framer-motion installed as dependency
-- [x] Dev server running on port 3001 (exposed via sandbox proxy)
+- [x] CAPTCHA DELL'INFERNO - running via Vite (captcha-hell/)
+- [x] Dev server running on port 3001 (Vite, exposed via sandbox proxy)
 
 ## Current Structure
 
 | File/Directory | Purpose | Status |
 |----------------|---------|--------|
-| `src/app/page.tsx` | Home page (CAPTCHA DELL'INFERNO) | ✅ Running |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles + captcha animations | ✅ Ready |
-| `captcha-hell/` | Original Vite project (not linted) | ⚪ Preserved |
+| `captcha-hell/` | CAPTCHA DELL'INFERNO Vite SPA | ✅ Running on :3001 |
+| `captcha-hell/src/App.jsx` | Main captcha component | ✅ Active |
+| `captcha-hell/src/index.css` | Styles + animations | ✅ Active |
 | `.kilocode/` | AI context & recipes | ✅ Ready |
 
 ## Current Focus
@@ -89,4 +87,4 @@ export async function GET() {
 | Date | Changes |
 |------|---------|
 | Initial | Template created with base setup |
-| 2026-03-19 | Ported CAPTCHA DELL'INFERNO to Next.js page, installed framer-motion, started dev server on port 3001 |
+| 2026-03-19 | Started Next.js, switched to Vite SPA for CAPTCHA DELL'INFERNO |
